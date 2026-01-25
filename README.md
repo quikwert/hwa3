@@ -72,11 +72,11 @@ Reading the top without removing it: double tos() <br>
 Check whether two stacks are equal: boolean equals (Object o) <br>
 Conversion of the stack to string (top last): String toString() <br>
 </br>
-Write a method
-public static double interpret (String pol)
+Write a method <br>
+public static double interpret (String pol) <br>
 to calculate the value of an arithmetic expression pol in RPN (Reverse Polish Notation) using this stack type. Expression is a string which contains double numbers (including negative and multi-digit numbers) and arithmetic operations + - * / separated by whitespace symbols. The result must be double value of the expression or throwing a RuntimeException in case the expression is not correct. Expression is not correct if it is empty, contains illegal symbols, leaves redundant elements on top of stack or causes stack underflow.
 All error messages must contain full context (e.g. illegal string that caused the error) and an explanation of the situation in user terms.
-<br>
+<br></br>
 Example. DoubleStack.interpret ("2. 15. -") should return -13. .
 
 

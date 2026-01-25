@@ -60,23 +60,23 @@ java -cp "bin:lib/*" org.junit.runner.JUnitCore DoubleStackTest
 ## 📋 Task Description
 
 Implement an abstract data type "Stack of double numbers" (LIFO) using linkedlists. String representation of a stack (provided by toString method) must be ordered from bottom to top (tos is the last element).
-
-List of compulsory operations:
-Constructor for a new stack: DoubleStack()
-Copy of the stack: Object clone()
-Check whether the stack is empty: boolean stEmpty()
-Adding an element to the stack: void push (double a)
-Removing an element from the stack: double pop()
-Arithmetic operation s ( + - * / ) between two topmost elements of the stack (result is left on top): void op (String s)
-Reading the top without removing it: double tos()
-Check whether two stacks are equal: boolean equals (Object o)
-Conversion of the stack to string (top last): String toString()
-
+<br>
+List of compulsory operations:<br>
+Constructor for a new stack: DoubleStack() <br>
+Copy of the stack: Object clone() <br>
+Check whether the stack is empty: boolean stEmpty() <br>
+Adding an element to the stack: void push (double a) <br>
+Removing an element from the stack: double pop() <br>
+Arithmetic operation s ( + - * / ) between two topmost elements of the stack (result is left on top): void op (String s) <br>
+Reading the top without removing it: double tos() <br>
+Check whether two stacks are equal: boolean equals (Object o) <br>
+Conversion of the stack to string (top last): String toString() <br>
+</br>
 Write a method
 public static double interpret (String pol)
 to calculate the value of an arithmetic expression pol in RPN (Reverse Polish Notation) using this stack type. Expression is a string which contains double numbers (including negative and multi-digit numbers) and arithmetic operations + - * / separated by whitespace symbols. The result must be double value of the expression or throwing a RuntimeException in case the expression is not correct. Expression is not correct if it is empty, contains illegal symbols, leaves redundant elements on top of stack or causes stack underflow.
 All error messages must contain full context (e.g. illegal string that caused the error) and an explanation of the situation in user terms.
-
+<br>
 Example. DoubleStack.interpret ("2. 15. -") should return -13. .
 
 

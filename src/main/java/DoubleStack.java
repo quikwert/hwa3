@@ -8,7 +8,7 @@ public class DoubleStack {
 
 
 
-	public static void main (String[] argum)throws Exception{
+	public static void main (String[] argum) throws Exception{
 	   DoubleStack stack1 = new DoubleStack();
 	   stack1.push(1);
 	   stack1.push(2);
@@ -67,12 +67,7 @@ public class DoubleStack {
 
 	public void push (double a) {
 		DoubleStackElement newElement;
-		if(stackPointer == null){
-			newElement = new DoubleStackElement(a, null);	
-		}else {
-			newElement = new DoubleStackElement(a, stackPointer.prevElement);
-		}
-		newElement.prevElement = stackPointer;
+		newElement = new DoubleStackElement(a, stackPointer);	
 		stackPointer = newElement;
 	}
 

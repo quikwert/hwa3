@@ -10,7 +10,7 @@ public class DoubleStack {
 
 
 	public static void main (String[] argum) throws Exception{
-   DoubleStack stack1 = new DoubleStack();
+	   DoubleStack stack1 = new DoubleStack();
 	   stack1.push(1);
 	   stack1.push(2);
 	   stack1.push(3);
@@ -23,7 +23,7 @@ public class DoubleStack {
 	   System.out.println(DoubleStack.interpret("3 2 *      3 +  \t\t \t 4 /"));
 	   System.out.println(DoubleStack.interpret("3543"));
 	   
-	   System.out.println(DoubleStack.interpret("-10. 4. 8. 3. - + * +"));
+	   System.out.println(DoubleStack.interpret("1. -10. 4. 8. 3. - + * +"));
 
 	   System.out.println( stack1.toString() );
 	   System.out.println( stack2.toString() );
@@ -74,7 +74,7 @@ public class DoubleStack {
 
 	public double pop(){
 		if(stackPointer == null){
-			throw new RuntimeException("Stack is empty!");
+			throw new RuntimeException();
 		}
 		double ret = stackPointer.value;
 		stackPointer = stackPointer.prevElement;
@@ -117,11 +117,7 @@ public class DoubleStack {
 
 	public void op (String token){
 		Operation operation = OperationRegistry.get(token);
-		try{
-			operation.execute(this);
-		}catch (RuntimeException e){
-			throw new RuntimeException(e.getMessage());
-		}
+		operation.execute(this);
 	}
 	public static double interpret (String pol){
 		DoubleStack stack = new DoubleStack();
@@ -129,19 +125,18 @@ public class DoubleStack {
 		String noTabs = noDupSpaces.replaceAll("\\t+", " ");
 		String trim = noTabs.trim();
 		String tokens[] = trim.split(" ");
-
 		for(String token: tokens) {
+
 			if(isNumber(token)){
 				stack.push(Double.parseDouble(token));
 			}
 			else {
-				try {stack.op(token);}
-				catch(RuntimeException e){throw new RuntimeException("Too little operands for operation: " + token + " in:\n " + pol);}
+				stack.op(token);
 			}
 
 		}
 		double ret = stack.pop();
-		if(!stack.stEmpty()) throw new RuntimeException("Too many numbers in:\n " + pol);
+		if(!stack.stEmpty()) throw new RuntimeException("Too many numbers");
 		return ret;
 	}
 
@@ -219,7 +214,7 @@ class SubtractOperation implements Operation{
 			operandA = stack.pop();
 
 		}catch(RuntimeException e){
-			throw new RuntimeException("Not enough operands for: -");	
+			throw new RuntimeException("Not enough operands for: +");	
 		}			
 		stack.push(operandA - operandB);
 	}
@@ -235,7 +230,7 @@ class MultiplyOperation implements Operation{
 			operandB = stack.pop();
 
 		}catch(RuntimeException e){
-			throw new RuntimeException("Not enough operands for: *");	
+			throw new RuntimeException("Not enough operands for: +");	
 		}			
 		stack.push(operandA * operandB);
 			
@@ -252,7 +247,7 @@ class DivideOperation implements Operation{
 			operandA = stack.pop();
 
 		}catch(RuntimeException e){
-			throw new RuntimeException("Not enough operands for: /");	
+			throw new RuntimeException("Not enough operands for: +");	
 		}			
 			
 		stack.push(operandA / operandB);
@@ -271,7 +266,7 @@ class SwapOperation implements Operation{
 			stack.push(operandB);
 			stack.push(operandA);
 		}catch(RuntimeException e){
-			throw new RuntimeException("Error: Too little numbers for operation 'Swap', at least 2 numbers must be present on the stack");
+			throw new RuntimeException("Error: not enough numbers for operation 'Swap', at least 2 numbers must be present on the stack");
 		}	
 	}
 }
@@ -284,7 +279,7 @@ class DupOperation implements Operation{
 			operandA = stack.tos();
 			stack.push(operandA);
 		}catch(RuntimeException e){
-			throw new RuntimeException("Error: Too little arguments for operation 'DUP', at least 1 number must be present on the stack.");
+			throw new RuntimeException("Error: Stack is empty");
 		}	
 	}
 }
@@ -306,7 +301,7 @@ class RotOperation implements Operation{
 			stack.push(operandB);
 			
 		}catch(RuntimeException e){
-			throw new RuntimeException("Error: Too little arguments for operation 'ROT', at least 3 numbers must be present on the stack");
+			throw new RuntimeException("Error: not enough numbers for operation 'ROT', at least 3 numbers must be present on the stack");
 		}	
 	}
 }
@@ -319,7 +314,7 @@ class DropOperation implements Operation{
 		try{
 			operandA = stack.pop();
 		}catch(RuntimeException e){
-			throw new RuntimeException("Error: Too little arguments for operation 'DROP'");
+			throw new RuntimeException("Error: Stack is empty");
 		}	
 	}
 }

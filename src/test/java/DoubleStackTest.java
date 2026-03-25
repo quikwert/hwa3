@@ -271,5 +271,47 @@ public class DoubleStackTest {
    public void testTooFewNumbers3() {
       DoubleStack.interpret ("+");
    }
+   @Test (expected=RuntimeException.class)
+   public void testTooFewNumbersSwap() { DoubleStack.interpret ("1 SWAP"); }
+
+   @Test (expected=RuntimeException.class)
+   public void testTooFewNumbersDup() {
+      DoubleStack.interpret ("DUP");
+   }
+
+   @Test (expected=RuntimeException.class)
+   public void testTooFewNumbersDrop() {
+      DoubleStack.interpret ("DROP");
+   }
+
+   @Test (expected=RuntimeException.class)
+   public void testTooFewNumbersRot() { DoubleStack.interpret ("2 5 ROT"); }
+
+   @Test (timeout=1000)
+   public void testInterpretStackOpsPositive() {
+      String s = "2 5 SWAP -";
+      assertEquals ("expression: " + s, 3., DoubleStack.interpret (s), delta);
+
+      s = "2 5 9 ROT - +";
+      assertEquals ("expression: " + s, 12., DoubleStack.interpret (s), delta);
+
+      s = "3 DUP *";
+      assertEquals ("expression: " + s, 9., DoubleStack.interpret (s), delta);
+
+      s = "3 7 DROP";
+      assertEquals ("expression: " + s, 3., DoubleStack.interpret (s), delta);
+
+      s = "9 11 17 ROT - SWAP -";
+      assertEquals ("expression: " + s, -3., DoubleStack.interpret (s), delta);
+
+      s = "-3 -5 -7 ROT - SWAP DUP * +";
+      assertEquals ("expression: " + s, 21., DoubleStack.interpret (s), delta);
+
+      s = "9 11 17 DUP ROT - SWAP DROP -";
+      assertEquals ("expression: " + s, 3., DoubleStack.interpret (s), delta);
+   }
+
 }
+
+
 

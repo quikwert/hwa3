@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.function.Supplier;
 
 /** Stack manipulation.
  * @since 1.8
@@ -81,27 +82,6 @@ public class DoubleStack {
 		return ret;
 	} // pop
 
-	public void op (String s){
-		double operandA; 
-                double operandB;
-		try{
-			operandA = this.pop(); 
-			operandB = this.pop();
-		}catch (RuntimeException e){
-			
-			throw new RuntimeException("Too little arguments for operator: " + s);
-		}	
-
-		//if(!this.stEmpty()) throw new RuntimeException("Too many arguments for operator: " + s);	
-
-		switch(s) {
-			case "+": this.push(operandB + operandA); break;
-			case "-": this.push(operandB - operandA); break;
-			case "*": this.push(operandB * operandA); break;
-			case "/": this.push(operandB / operandA); break;
-			default: throw new RuntimeException("Unknown operator: " + s);
-		}
-	}
 
 	public double tos() {
 		if(this.stackPointer == null)throw new RuntimeException("Stack is Empty");
@@ -135,29 +115,38 @@ public class DoubleStack {
 		return strBuf;
 	}
 
+	public void op (String token){
+		Operation operation = OperationRegistry.get(token);
+		operation.execute(this);
+	}
 	public static double interpret (String pol){
 		DoubleStack stack = new DoubleStack();
 		String noDupSpaces = pol.replaceAll("\\s+", " ");
 		String noTabs = noDupSpaces.replaceAll("\\t+", " ");
 		String trim = noTabs.trim();
 		String tokens[] = trim.split(" ");
-		for(int i = 0; i < tokens.length; i++) {
+		for(String token: tokens) {
 
-			if(tokens[i].equals("+") || tokens[i].equals("-") || tokens[i].equals("/") || tokens[i].equals("*")){
-				stack.op(tokens[i]);
+			if(isNumber(token)){
+				stack.push(Double.parseDouble(token));
 			}
 			else {
-				try{
-					stack.push(Double.parseDouble(tokens[i]));
-				}catch (NumberFormatException e){
-					throw new RuntimeException("Invalid format for: " + tokens[i]);
-				}
+				stack.op(token);
 			}
 
 		}
 		double ret = stack.pop();
 		if(!stack.stEmpty()) throw new RuntimeException("Too many numbers");
 		return ret;
+	}
+
+	private static boolean isNumber(String token){
+		try{
+			Double.parseDouble(token);
+			return true;
+		}catch (NumberFormatException e){
+			return false;
+		}	
 	}
 
 	private class DoubleStackElement{
@@ -171,3 +160,161 @@ public class DoubleStack {
 	}
 }
 
+
+interface Operation{
+	public void execute (DoubleStack stack);
+}
+
+class OperationRegistry {
+	private static final Map<String, Supplier<Operation>> operations =
+	    Map.of(
+		"+", AddOperation::new,	
+		"-", SubtractOperation::new,	
+		"*", MultiplyOperation::new,	
+		"/", DivideOperation::new,	
+		"swap", SwapOperation::new,	
+		"dup", DupOperation::new,	
+		"rot", RotOperation::new,	
+		"drop", DropOperation::new	
+	    );
+
+    public static Operation get(String token) {
+        Supplier<Operation> supplier = operations.get(token);
+        if (supplier == null) {
+            throw new IllegalArgumentException("Unknown operation: " + token);
+        }
+        return supplier.get();
+    }
+}
+
+class AddOperation implements Operation{
+	@Override	
+	public void execute (DoubleStack stack){
+		double operandA;
+		double operandB;
+		try{
+			operandA = stack.pop();
+			operandB = stack.pop();
+
+		}catch(RuntimeException e){
+			throw new RuntimeException("Not enough operands for: +");	
+		}			
+		stack.push(operandA + operandB);
+	}
+}
+
+class SubtractOperation implements Operation{
+	@Override	
+	public void execute (DoubleStack stack){
+			
+		double operandA;
+		double operandB;
+		try{
+			operandB = stack.pop();
+			operandA = stack.pop();
+
+		}catch(RuntimeException e){
+			throw new RuntimeException("Not enough operands for: +");	
+		}			
+		stack.push(operandA - operandB);
+	}
+}
+
+class MultiplyOperation implements Operation{
+	@Override	
+	public void execute (DoubleStack stack){
+		double operandA;
+		double operandB;
+		try{
+			operandA = stack.pop();
+			operandB = stack.pop();
+
+		}catch(RuntimeException e){
+			throw new RuntimeException("Not enough operands for: +");	
+		}			
+		stack.push(operandA * operandB);
+			
+	}
+}
+
+class DivideOperation implements Operation{
+	@Override	
+	public void execute (DoubleStack stack){
+		double operandA;
+		double operandB;
+		try{
+			operandB = stack.pop();
+			operandA = stack.pop();
+
+		}catch(RuntimeException e){
+			throw new RuntimeException("Not enough operands for: +");	
+		}			
+			
+		stack.push(operandA / operandB);
+	}
+}
+
+class SwapOperation implements Operation{
+	@Override	
+	public void execute (DoubleStack stack){
+		double operandA;
+		double operandB;
+		try{
+			operandB = stack.pop();
+			operandA = stack.pop();
+
+			stack.push(operandB);
+			stack.push(operandA);
+		}catch(RuntimeException e){
+			throw new RuntimeException("Error: not enough numbers for operation 'Swap', at least 2 numbers must be present on the stack");
+		}	
+	}
+}
+
+class DupOperation implements Operation{
+	@Override	
+	public void execute (DoubleStack stack){
+		double operandA;
+		try{
+			operandA = stack.tos();
+			stack.push(operandA);
+		}catch(RuntimeException e){
+			throw new RuntimeException("Error: Stack is empty");
+		}	
+	}
+}
+
+class RotOperation implements Operation{
+	@Override	
+	public void execute (DoubleStack stack){
+			
+		double operandA;
+		double operandB;
+		double operandC;
+		try{
+			operandC = stack.pop();
+			operandB = stack.pop();
+			operandA = stack.pop();
+
+			stack.push(operandA);
+			stack.push(operandC);
+			stack.push(operandB);
+			
+		}catch(RuntimeException e){
+			throw new RuntimeException("Error: not enough numbers for operation 'ROT', at least 3 numbers must be present on the stack");
+		}	
+	}
+}
+
+class DropOperation implements Operation{
+	@Override	
+	public void execute (DoubleStack stack){
+			
+		double operandA;
+		try{
+			operandA = stack.pop();
+		}catch(RuntimeException e){
+			throw new RuntimeException("Error: Stack is empty");
+		}	
+	}
+}
